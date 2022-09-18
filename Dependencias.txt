@@ -1,6 +1,0 @@
-pip install fastapi
-pip install uvicorn
-pip install mangum
-
-#Execução 
-python -m uvicorn main:app --reload

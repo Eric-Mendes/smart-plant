@@ -1,0 +1,5 @@
+#Execução 
+python -m uvicorn main:app --reload
+
+
+python -m uvicorn src.app.run:app --reload

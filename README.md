@@ -6,3 +6,4 @@ Há um ambiente Docker para facilitar no encapsulamento do projeto. Para rodá-l
 ```
 docker compose up backend
 ```
+Após isto, a API é acessível no endereço [0.0.0.0:8000]()

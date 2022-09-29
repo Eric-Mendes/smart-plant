@@ -46,7 +46,7 @@ def create_fake_sensors(num_sensors: int) -> list:
     for sensor_id in range(1, num_sensors):
         metrics = []
         for metric in range(1, 5):
-            metrics.append(get_limite(20, 100))
+            metrics.append(get_limit(20, 100))
         sensors_list.append(
             Sensor(
                 id=sensor_id,
@@ -79,10 +79,10 @@ def create_user(num_user: int) -> list:
     return list_date_user
 
 
-def get_temp_history(init_temp: int, fim_temp: int, num_teste=20) -> list:
+def get_history(init_temp: int, fim_temp: int, n_days=20) -> list:
     """Retornando tempo para cada tipo de temperatura"""
     my_history = []
-    for i in range(1, num_teste):
+    for i in range(1, n_days):
         my_history.extend(
             [
                 {
@@ -95,7 +95,7 @@ def get_temp_history(init_temp: int, fim_temp: int, num_teste=20) -> list:
     return my_history
 
 
-def get_limite(init_temp=20, fim_temp=40):
+def get_limit(init_temp=20, fim_temp=40) -> dict:
     """Retornando tempo limite"""
     temp_atual = random.randint(init_temp, fim_temp)
     return {"limit": temp_atual}
@@ -104,5 +104,5 @@ def get_temp_atual(init_temp=20, fim_temp=40) -> int:
     return random.randint(init_temp, fim_temp)
 
 
-def get_has_exceeded_limit(num: int) -> bool:
+def get_has_exceeded_limit(num: int) -> bool :
     return True if num % 2 else False

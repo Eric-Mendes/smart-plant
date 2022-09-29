@@ -1,7 +1,7 @@
 import random
 from fastapi import FastAPI
 from pydantic import BaseModel
-import src.drivers.mocks.dash_web_mocker as web
+import src.drivers.mocks.dash_mocker as web
 
 # Criando aplicação
 app = FastAPI()

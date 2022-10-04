@@ -53,3 +53,38 @@ def get_sensors(n_sensors:int):
 @app.get("/history")
 def get_values(sensor_id:int, n_days:int):
     return web.build_temp_history(sensor_id, n_days)
+
+#POST
+@app.post("/sensors",tags=["sensors"],summary= 'Cria um sensor')
+def create_sensor(my_sensor:web.MySensor):
+    # my_sensor = {
+    #     "name": input_json["name"],
+    #     "located_at": input_json["located_at"],
+    #     "limit_value": input_json["limit_value"]
+    # }
+    # web.MySensor(
+    #         name: input_json["name"],
+    #         located_at: input_json["located_at"],
+    #         limit_value: input_json["limit_value"]
+    # )
+    print('Sensor adicionado')
+    ## Adicionar status 
+
+    web.add_sensor_to_db(my_sensor)
+
+
+
+
+# #PATCH
+@app.patch("/sensors/{id}",tags=["sensors"],summary= 'Cria um sensor')
+def sensor(id:int, input_json:web.MySensor):
+
+    web.patch_sensor(id, input_json)
+
+
+    # patch_json = {
+    #     "name": "Joasasaão",
+    #     "located_at" :"aaaaa"
+    # }
+
+    # sensor(10, patch_json)  

@@ -37,3 +37,9 @@ def listando_date_user() -> list:
 @app.get("/sensorsInfo")
 def get_sensors_info():
     return web.create_fake_sensors(10)
+
+###################################################################################
+#GET 
+@app.get("/sensors/{sensor_id}",tags=["sensors"],summary= 'Retorna as informações de um sensor específico.')
+def get_sensor(sensor_id:int):
+    return web.sensor_builder(sensor_id)

@@ -38,6 +38,10 @@ class MySensor(BaseModel):
     #     "limit_value": input_json["limit_value"]
     # }
 
+#Criando Base de dados teste para os sensores 
+
+
+
 NAME_LIST = ["Temperature", "Humidity", "Potency"]
 LOCATIONS = ["Room", "Boiler", "Cooler"]
 

@@ -1,4 +1,6 @@
 # disable pylint(no-name-in-module)
+import datetime
+import math
 import random
 from pydantic import BaseModel
 
@@ -25,6 +27,42 @@ class Sensor(BaseModel):
     metrics: list
     has_exceeded_limit: bool
 
+class MySensor(BaseModel):
+    name:str
+    located_at:str
+    limit_value:float
+
+    # my_sensor = {
+    #     "name": input_json["name"],
+    #     "located_at": input_json["located_at"],
+    #     "limit_value": input_json["limit_value"]
+    # }
+
+#Criando Base de dados teste para os sensores 
+
+
+
+NAME_LIST = ["Temperature", "Humidity", "Potency"]
+LOCATIONS = ["Room", "Boiler", "Cooler"]
+
+def sensor_builder(sensor_id:int) -> dict:
+    return {
+        "id": sensor_id,
+        "name": NAME_LIST[random.randint(0,len(NAME_LIST)-1)] + f"_{random.randint(0,999)}",
+        "located_at": LOCATIONS[random.randint(0,len(LOCATIONS)-1)] + f"_{random.randint(0,999)}",
+        "limit_value": random.randint(30, 50)
+    }
+
+def build_temp_history(sensor_id:int, n_days:int)->list:
+    base = datetime.datetime.today()
+    date_list = [str(base - datetime.timedelta(days=x, hours=y)) for x in range(n_days) for y in range(0,25)]
+
+    temp_history = [{
+        "timestamp": date,
+        "value": random.uniform(21,25) + 10*math.log10(sensor_id)
+    } for date in date_list]
+    
+    return temp_history
 
 def create_fake_metrics(num_metrics: int) -> list:
     metrics_list = []
@@ -106,3 +144,16 @@ def get_temp_atual(init_temp=20, fim_temp=40) -> int:
 
 def get_has_exceeded_limit(num: int) -> bool :
     return True if num % 2 else False
+
+def add_sensor_to_db(my_sensor:MySensor):
+    pass
+
+def patch_sensor(id:int, sensor:MySensor):
+    # if("name" in sensor.keys()):
+    #     print(f"Editar nome de {id}")
+    # if("located_at" in sensor.keys()):
+    #     print(f"Editar local de {id}")
+    # if("limit_value" in sensor.keys()):
+    #     print(f"Editar valor limite de {id}")
+    print('Patch deu Bom !!')
+    

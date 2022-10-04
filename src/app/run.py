@@ -20,17 +20,18 @@ def listando_date_user() -> list:
     return web.create_user(1000)
 
 
-@app.get("/history")
-def get_history(id:int,n_days:int) -> list:
-    """Retornando tempo para cada tipo de temperatura"""
-    print(id)
-    return web.get_history(27, 30, n_days=n_days)
+#Kill
+# @app.get("/history")
+# def get_history(id:int,n_days:int) -> list:
+#     """Retornando tempo para cada tipo de temperatura"""
+#     print(id)
+#     return web.get_history(27, 30, n_days=n_days)
 
-
-@app.get("/timeLimites")
-def get_limit():
-    """Retornando tempo limite"""
-    return web.get_limit(20, 40)
+#Kill
+# @app.get("/timeLimites")
+# def get_limit():
+#     """Retornando tempo limite"""
+#     return web.get_limit(20, 40)
 
 
 @app.get("/sensorsInfo")

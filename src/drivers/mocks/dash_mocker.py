@@ -139,3 +139,15 @@ def get_temp_atual(init_temp=20, fim_temp=40) -> int:
 
 def get_has_exceeded_limit(num: int) -> bool :
     return True if num % 2 else False
+    
+def add_sensor_to_db(my_sensor:MySensor):
+    pass
+
+def patch_sensor(id:int, sensor:MySensor):
+    # if("name" in sensor.keys()):
+    #     print(f"Editar nome de {id}")
+    # if("located_at" in sensor.keys()):
+    #     print(f"Editar local de {id}")
+    # if("limit_value" in sensor.keys()):
+    #     print(f"Editar valor limite de {id}")
+    print('Patch deu Bom !!')

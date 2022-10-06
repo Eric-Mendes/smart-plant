@@ -12,7 +12,7 @@ def test_extract():
     extract_excel = ExtractSensores
     df_allure = ExtractSensores(extract_excel)
     datas_allure = df_allure.extract()
-    print(datas_allure)
+    #print(datas_allure)
     
     #print(datas_allure)
     #assert isinstance(datas_allure,ExtractContract)

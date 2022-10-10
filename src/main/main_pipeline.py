@@ -1,6 +1,7 @@
 from datetime import datetime
-import datetime as date
-
+from src.stages.extract.extract import ExtractSensores
+from src.drivers.extractor_thingsboard import DriversThingsBoard
+from src.stages.transform.transform_raw_data import TransformRawData
 
 
 class MainPipeline:
@@ -8,11 +9,17 @@ class MainPipeline:
     @classmethod
     def run_pipeline(cls) -> None:
         ''' Colocar doctring'''
-        inicio = date.datetime.now()
-        print(f"Inicio: {date.datetime.now()}")
+        inicio = datetime.now()
+        print(f"Inicio: {inicio}")
+        
+        df_allure = ExtractSensores(DriversThingsBoard)
+        datas_allure = df_allure.extract()
 
-    
-        print(f"Fim: {date.datetime.now()}")
-        fim = date.datetime.now()
+        teste_contract  = TransformRawData()
+        transform_data = teste_contract.transform(datas_allure)
+
+        print(transform_data)
+
+        fim = datetime.now()
+        print(f"Fim: {fim}")
         print(f"Diferenca de data {fim-inicio} ")
- 

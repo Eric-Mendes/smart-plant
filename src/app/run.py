@@ -2,6 +2,7 @@ import random
 from fastapi import FastAPI
 from pydantic import BaseModel
 import src.drivers.mocks.dash_mocker as web
+import src.drivers.interfaces.keycloak_auth as auth
 
 # Criando aplicação
 app = FastAPI()
@@ -19,6 +20,11 @@ def root() -> dict:
 def listando_date_user() -> list:
     """Listando todos dados"""
     return web.create_user(1000)
+
+@app.get("/authUser", summary='Tenta autenticar o usuário')
+def auth_user(username: str, password: str) -> bool:
+    return auth.validate_user_credentials(username, password)
+
 
 #Kill
 # @app.get("/history")

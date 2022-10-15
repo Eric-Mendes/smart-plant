@@ -1,8 +1,7 @@
-import random
-from fastapi import FastAPI
-from pydantic import BaseModel
-import src.drivers.mocks.dash_mocker as web
+from fastapi import FastAPI, status, Response
+
 import src.drivers.interfaces.keycloak_auth as auth
+import src.drivers.mocks.dash_mocker as web
 
 # Criando aplicação
 app = FastAPI()
@@ -21,9 +20,21 @@ def listando_date_user() -> list:
     """Listando todos dados"""
     return web.create_user(1000)
 
+
 @app.get("/authUser", summary='Tenta autenticar o usuário')
-def auth_user(username: str, password: str) -> bool:
-    return auth.validate_user_credentials(username, password)
+def auth_user(username: str, password: str, response: Response) -> bool:
+    is_valid = auth.validate_user_credentials(username, password)
+    if not is_valid:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+    return is_valid
+
+
+@app.get("/authUserInfo", summary='Tenta autenticar usuário e retorna user info', status_code=status.HTTP_200_OK)
+def auth_user_get_user_info(username: str, password: str, response: Response):
+    user = auth.validate_credentials_get_user_info(username, password)
+    if user is None:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+    return user
 
 
 #Kill
@@ -44,7 +55,7 @@ def auth_user(username: str, password: str) -> bool:
 def get_sensors_info():
     return web.create_fake_sensors(10)
 ###################################################################################
-#GET 
+#GET
 @app.get("/sensors/{sensor_id}",tags=["sensors"],summary= 'Retorna as informações de um sensor específico.')
 def get_sensor(sensor_id:int):
     return web.sensor_builder(sensor_id)
@@ -63,11 +74,10 @@ def get_values(sensor_id:int, n_days:int):
 def create_sensor(my_sensor:web.MySensor):
 
     baseDadosTest.append(my_sensor) # Apenas para teste.
-    
+
     web.add_sensor_to_db(my_sensor)
 
 # #PATCH
 @app.patch("/sensors/{id}",tags=["sensors"],summary= 'Cria um sensor')
 def sensor(id:int, input_json:web.MySensor):
     web.patch_sensor(id, input_json)
-

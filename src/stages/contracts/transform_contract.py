@@ -6,6 +6,4 @@ TransformContract = namedtuple(
     '''
         load_content
     '''
-
-
 )

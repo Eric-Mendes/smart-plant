@@ -12,11 +12,11 @@ class MainPipeline:
         inicio = datetime.now()
         print(f"Inicio: {inicio}")
         
-        df_allure = ExtractSensores(DriversThingsBoard)
-        datas_allure = df_allure.extract()
+        df_things_board = ExtractSensores(DriversThingsBoard)
+        datas_things_board = df_things_board.extract()
 
         teste_contract  = TransformRawData()
-        transform_data = teste_contract.transform(datas_allure)
+        transform_data = teste_contract.transform(datas_things_board)
 
         print(transform_data)
 

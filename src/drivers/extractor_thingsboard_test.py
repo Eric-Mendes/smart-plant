@@ -4,12 +4,12 @@ import json
 
 def test_extractor_thingsboard()-> None:
     """teste de extração de arquivos no formato xlsx"""
-    extractor_pandas = DriversThingsBoard
+    extractor_things_board = DriversThingsBoard
 
 
-    token = extractor_pandas.getToken("mc855.projeto.5@gmail.com", "vaX7Og1ehO74bFB")
+    token = extractor_things_board.getToken("mc855.projeto.5@gmail.com", "vaX7Og1ehO74bFB")
 
-    devices_ids = extractor_pandas.getDevices(token)
+    devices_ids = extractor_things_board.getDevices(token)
 
     unity_table = {
         "temperature": "celcius - checar",
@@ -20,7 +20,7 @@ def test_extractor_thingsboard()-> None:
     data = []
 
     for device_id in devices_ids:
-        result = extractor_pandas.getTelemetry(device_id, token)
+        result = extractor_things_board.getTelemetry(device_id, token)
         for key in result.keys():
                 data.append({
                     "sensor_id": device_id,

@@ -18,10 +18,13 @@ class TransformRawData:
         except Exception as exception:
             raise TransformError(str(exception)) from exception
 
-    def __transfor_date(self, extract_allure: ExtractContract):
-        data_thingsboard = extract_allure[0]
+    def __transfor_date(self, extract_things_board: ExtractContract):
+        data_thingsboard = extract_things_board[0]
         #print('\n================================')
         #print(data_thingsboard)
+        #{'humidity': [{'ts': 1665452363672, 'value': '8'}], 'temperature': [{'ts': 1665518044594, 'value': '2147483647'}]} 
+
+        
         return data_thingsboard
 
     

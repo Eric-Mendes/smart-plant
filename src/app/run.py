@@ -32,7 +32,7 @@ def listando_date_user() -> list:
     return web.create_user(1000)
 
 
-@app.get("/authUser", summary='Tenta autenticar o usuário')
+@app.get("/authUser", tags=["auth"], summary='Tenta autenticar o usuário')
 def auth_user(username: str, password: str, response: Response, settings: Settings = Depends(get_settings)) -> bool:
     is_valid = auth.validate_user_credentials(username, password, settings)
     if not is_valid:
@@ -40,7 +40,7 @@ def auth_user(username: str, password: str, response: Response, settings: Settin
     return is_valid
 
 
-@app.get("/authUserInfo", summary='Tenta autenticar usuário e retorna user info', status_code=status.HTTP_200_OK)
+@app.get("/authUserInfo", tags=["auth"], summary='Tenta autenticar usuário e retorna user info', status_code=status.HTTP_200_OK)
 def auth_user_get_user_info(username: str, password: str, response: Response,
                             settings: Settings = Depends(get_settings)):
     user = auth.validate_credentials_get_user_info(username, password, settings)

@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from fastapi import FastAPI, status, Response
+from fastapi import FastAPI, status, Response, Depends
 
 import src.drivers.interfaces.keycloak_auth as auth
 import src.drivers.mocks.dash_mocker as web
@@ -33,16 +33,17 @@ def listando_date_user() -> list:
 
 
 @app.get("/authUser", summary='Tenta autenticar o usuário')
-def auth_user(username: str, password: str, response: Response) -> bool:
-    is_valid = auth.validate_user_credentials(username, password)
+def auth_user(username: str, password: str, response: Response, settings: Settings = Depends(get_settings)) -> bool:
+    is_valid = auth.validate_user_credentials(username, password, settings)
     if not is_valid:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     return is_valid
 
 
 @app.get("/authUserInfo", summary='Tenta autenticar usuário e retorna user info', status_code=status.HTTP_200_OK)
-def auth_user_get_user_info(username: str, password: str, response: Response):
-    user = auth.validate_credentials_get_user_info(username, password)
+def auth_user_get_user_info(username: str, password: str, response: Response,
+                            settings: Settings = Depends(get_settings)):
+    user = auth.validate_credentials_get_user_info(username, password, settings)
     if user is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     return user

@@ -2,6 +2,8 @@ import keycloak as kc
 from pydantic import BaseModel
 from typing import List, Optional
 
+from src.drivers.interfaces.config import Settings
+
 
 class KeycloakGroup(BaseModel):
     id: str
@@ -18,12 +20,12 @@ class KeycloakUser(BaseModel):
     groups: List[KeycloakGroup]
 
 
-def validate_user_credentials(username: str, password: str) -> bool:
+def validate_user_credentials(username: str, password: str, settings: Settings) -> bool:
     try:
         keycloak_openid = kc.KeycloakOpenID(
-            server_url="http://172.19.0.1:8080/",
-            realm_name="master",
-            client_id="admin-cli"
+            server_url=settings.kc_server_url,
+            realm_name=settings.kc_realm_name,
+            client_id=settings.kc_client_id
         )
         keycloak_openid.token(username, password)
         return True
@@ -32,12 +34,12 @@ def validate_user_credentials(username: str, password: str) -> bool:
         return False
 
 
-def get_user_info(username: str) -> KeycloakUser:
+def get_user_info(username: str, settings: Settings) -> KeycloakUser:
     try:
-        keycloak_admin = kc.KeycloakAdmin(server_url="http://172.19.0.1:8080/",
-                                          username='admin',
-                                          password='admin',
-                                          realm_name="master")
+        keycloak_admin = kc.KeycloakAdmin(server_url=settings.kc_server_url,
+                                          username=settings.kc_admin_usernanme,
+                                          password=settings.kc_admin_password,
+                                          realm_name=settings.kc_realm_name)
         user_id = keycloak_admin.get_user_id(username)
         user = keycloak_admin.get_user(user_id)
         groups = get_user_kc_groups(keycloak_admin, user_id)
@@ -70,8 +72,8 @@ def get_user_kc_groups(keycloak_admin, user_id) -> List[KeycloakGroup]:
     return kc_groups
 
 
-def validate_credentials_get_user_info(username: str, password: str) -> Optional[KeycloakUser]:
-    if validate_user_credentials(username, password):
-        return get_user_info(username)
+def validate_credentials_get_user_info(username: str, password: str, settings: Settings) -> Optional[KeycloakUser]:
+    if validate_user_credentials(username, password, settings):
+        return get_user_info(username, settings)
     else:
         return None

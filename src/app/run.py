@@ -1,10 +1,21 @@
+from functools import lru_cache
+
 from fastapi import FastAPI, status, Response
 
 import src.drivers.interfaces.keycloak_auth as auth
 import src.drivers.mocks.dash_mocker as web
+from src.drivers.interfaces.config import Settings
+
 
 # Criando aplicação
 app = FastAPI()
+
+
+# Lendo variáveis de ambiente
+@lru_cache()
+def get_settings():
+    return Settings()
+
 
 baseDadosTest = []  # Apenas para teste.
 

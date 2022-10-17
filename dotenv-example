@@ -1,0 +1,5 @@
+kc_server_url="http://172.19.0.1:8080/auth/"
+kc_admin_usernanme="admin"
+kc_admin_password="admin"
+kc_realm_name="master"
+kc_client_id="admin-cli"

@@ -2,7 +2,7 @@ import keycloak as kc
 from pydantic import BaseModel
 from typing import List, Optional
 
-from src.drivers.interfaces.config import Settings
+from src.auth.config import Settings
 
 
 class KeycloakGroup(BaseModel):

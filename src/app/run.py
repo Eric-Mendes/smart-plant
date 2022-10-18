@@ -2,9 +2,9 @@ from functools import lru_cache
 
 from fastapi import FastAPI, status, Response, Depends
 
-import src.drivers.interfaces.keycloak_auth as auth
+import src.auth.keycloak_auth as auth
 import src.drivers.mocks.dash_mocker as web
-from src.drivers.interfaces.config import Settings
+from src.auth.config import Settings
 
 
 # Criando aplicação

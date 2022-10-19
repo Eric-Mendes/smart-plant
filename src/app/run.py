@@ -1,23 +1,19 @@
-from functools import lru_cache
+from fastapi import FastAPI, status, Response, Request
 
-from fastapi import FastAPI, status, Response, Depends
-
-import src.auth.keycloak_auth as auth
+import src.auth.keycloak as auth
 import src.drivers.mocks.dash_mocker as web
-from src.auth.config import Settings
-
+from fastapi.middleware.cors import CORSMiddleware
 
 # Criando aplicação
 app = FastAPI()
 
-
-# Lendo variáveis de ambiente
-@lru_cache()
-def get_settings():
-    return Settings()
-
-
-baseDadosTest = []  # Apenas para teste.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Rota Raiz
 @app.get("/",tags=["root"])
@@ -26,29 +22,167 @@ def root() -> dict:
     return {"message": "Hello World"}  # Retornando um dicionário
 
 
-@app.get("/users",tags=["users"],summary= 'Retorna as informações de cada usuario.')
-def listando_date_user() -> list:
-    """Listando todos dados"""
-    return web.create_user(1000)
+###### Validação Do Token #####
+def validate_request(request, response, group):
+    token = request.headers.get('Authorization')
+    my_authorization = auth.verify_token_and_group(token, group)
 
-
-@app.get("/authUser", tags=["auth"], summary='Tenta autenticar o usuário')
-def auth_user(username: str, password: str, response: Response, settings: Settings = Depends(get_settings)) -> bool:
-    is_valid = auth.validate_user_credentials(username, password, settings)
-    if not is_valid:
+    if(my_authorization["is_valid"] != True):
         response.status_code = status.HTTP_401_UNAUTHORIZED
-    return is_valid
+        return {
+            "msg": "invalid token"
+        }
+
+    elif(my_authorization["in_group"] != True):
+        response.status_code = status.HTTP_403_FORBIDDEN
+
+        return {
+            "msg": "the owener of the token is not an administrator"
+        }
+    
+    return True
+
+###### Auth ######
+@app.get("/authUser", tags=["auth"], summary='Tenta autenticar o usuário, retorna um token')
+def auth_user(username: str, password: str, response: Response) -> bool:
+    token = auth.validate_user_credentials(username, password)
+    if token is None:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return {
+            "msg": "wrong username/password"
+        }
+
+    else:
+        response.status_code = status.HTTP_202_ACCEPTED
+        return {
+            "access_token": token
+        }
 
 
 @app.get("/authUserInfo", tags=["auth"], summary='Tenta autenticar usuário e retorna user info', status_code=status.HTTP_200_OK)
-def auth_user_get_user_info(username: str, password: str, response: Response,
-                            settings: Settings = Depends(get_settings)):
-    user = auth.validate_credentials_get_user_info(username, password, settings)
+def auth_user_get_user_info(username: str, password: str, response: Response):
+    user = auth.validate_credentials_get_user_info(username, password)
     if user is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
     return user
 
+###### Validate #######
+@app.get("/validate", tags=["validate"], summary='Verifica se um token é valido, se for, retorna informações do usuario')
+def verify_token(request: Request):
+    token = request.headers.get('Authorization')
+    data = auth.getInfoByToken(token)
 
+    if(data is None):
+        return {
+            "is_valid": False
+        }
+
+    else:
+        return {
+            "is_valid": True,
+            **data,
+            "groups": auth.get_user_kc_groups(data["sub"])
+        }
+
+######## User #########
+@app.get("/user/list", tags=["user"], summary='Retorna uma lista de usuarios', status_code=status.HTTP_200_OK)
+def get_users(request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+        
+    else:
+        response.status_code = status.HTTP_200_OK
+
+        return {
+            "users" : auth.get_users()
+        }
+
+@app.post("/user", tags=["user"], summary= 'Cria um novo usuario, precisa do token de um admin')
+def create_user(data: auth.CreateUserData, request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    created = auth.createUser(data)
+
+    if(created == True):
+        response.status_code = status.HTTP_201_CREATED
+    else:
+        response.status_code = status.HTTP_409_CONFLICT
+
+@app.delete("/user", tags=["user"], summary= 'Deleta um usuario, precisa do token de um admin')
+def delete_user(user_id: str, request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    deleted = auth.deleteUser(user_id)
+
+    if(deleted == True):
+        response.status_code = status.HTTP_200_OK
+    else:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+
+####### userGroups #######
+
+@app.get("/userGroups", tags=["userGroups"], summary= 'Retorna os grupos de um dado id de usuario', status_code=status.HTTP_200_OK)
+def get_user_groups(user_id, request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    else:
+        groups = auth.get_user_kc_groups(user_id)
+
+        return {
+            "groups" : groups
+        }
+
+@app.post("/userGroups", tags=["userGroups"], summary='Adiciona um usuario a um grupo, precisa do token de um admin')
+def add_to_group(item: auth.UserGroup, request: Request, response: Response) -> bool:
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    user_id = item.user_id
+    group_list_ids = item.groups_ids
+
+    for group_id in group_list_ids:
+        auth.add_user_group(user_id, group_id)
+
+@app.delete("/userGroups", tags=["userGroups"], summary='Remove um usuario de um grupo, precisa do token de um admin')
+def remove(item: auth.UserGroup, request: Request, response: Response) -> bool:
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    user_id = item.user_id
+    group_list_ids = item.groups_ids
+
+    for group_id in group_list_ids:
+        auth.remove_user_group(user_id, group_id)
+
+####### groups ###########
+@app.get("/groups/list", tags=["groups"], summary= 'Retorna os grupos de um dado id de usuario', status_code=status.HTTP_200_OK)
+def get_groups(request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    else:
+        groups = auth.get_groups()
+
+        return {
+            "groups" : groups
+        }
 #Kill
 # @app.get("/history")
 # def get_history(id:int,n_days:int) -> list:
@@ -84,8 +218,6 @@ def get_values(sensor_id:int, n_days:int):
 #POST
 @app.post("/sensors",tags=["sensors"],summary= 'Cria um sensor')
 def create_sensor(my_sensor:web.MySensor):
-
-    baseDadosTest.append(my_sensor) # Apenas para teste.
 
     web.add_sensor_to_db(my_sensor)
 

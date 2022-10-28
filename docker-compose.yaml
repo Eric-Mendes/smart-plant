@@ -2,7 +2,8 @@ version: '3'
 
 volumes:
   postgres_data:
-      driver: local
+    driver: local
+  db_data:
 
 services:
   db:
@@ -12,7 +13,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
-      - ./src/data:/data/db
+      - db_data:/data/db
     ports:
       - 27017:27017
   backend:  

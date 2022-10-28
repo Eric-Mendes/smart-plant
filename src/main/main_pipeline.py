@@ -1,6 +1,7 @@
 from datetime import datetime
 from src.stages.extract.extract import ExtractSensores
 from src.drivers.extractor_thingsboard import DriversThingsBoard
+from src.stages.load.load import LoadTransformedData
 from src.stages.transform.transform_raw_data import TransformRawData
 
 
@@ -18,8 +19,9 @@ class MainPipeline:
         teste_contract  = TransformRawData()
         transform_data = teste_contract.transform(datas_things_board)
 
-        print(transform_data)
-
+        load = LoadTransformedData()
+        load_result = load.load(transform_data)
+        
         fim = datetime.now()
         print(f"Fim: {fim}")
         print(f"Diferenca de data {fim-inicio} ")

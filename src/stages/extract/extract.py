@@ -34,7 +34,7 @@ class ExtractSensores:
                             "sensor_id": device_id,
                             "type": key,
                             "value": result[key][0]["value"],
-                            "unity": UNITY_TABLE[key],
+                            "unity": None,#UNITY_TABLE[key],
                             "located_at": None,
                             "inserted_at": result[key][0]["ts"],
                             "updated_at": result[key][0]["ts"]

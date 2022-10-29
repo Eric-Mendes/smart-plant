@@ -10,18 +10,18 @@ class MainPipeline:
     @classmethod
     def run_pipeline(cls) -> None:
         ''' Colocar doctring'''
-        inicio = datetime.now()
-        print(f"Inicio: {inicio}")
+        # inicio = datetime.now()
+        # print(f"Inicio: {inicio}")
         
         df_things_board = ExtractSensores(DriversThingsBoard)
         datas_things_board = df_things_board.extract()
 
         teste_contract  = TransformRawData()
         transform_data = teste_contract.transform(datas_things_board)
-
+        #print(transform_data[0])
         load = LoadTransformedData()
-        load_result = load.load(transform_data)
+        load_result = load.load(transform_data[0])
         
-        fim = datetime.now()
-        print(f"Fim: {fim}")
-        print(f"Diferenca de data {fim-inicio} ")
+        # fim = datetime.now()
+        # print(f"Fim: {fim}")
+        # print(f"Diferenca de data {fim-inicio} ")

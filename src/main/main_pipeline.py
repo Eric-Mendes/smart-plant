@@ -18,9 +18,10 @@ class MainPipeline:
 
         teste_contract  = TransformRawData()
         transform_data = teste_contract.transform(datas_things_board)
-        #print(transform_data[0])
+        print(transform_data[0])
         load = LoadTransformedData()
         load_result = load.load(transform_data[0])
+        print(load_result)
         
         # fim = datetime.now()
         # print(f"Fim: {fim}")

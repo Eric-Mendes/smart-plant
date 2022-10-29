@@ -16,8 +16,21 @@ services:
       - db_data:/data/db
     ports:
       - 27017:27017
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile.etl
+    volumes:
+      - ./:/etl/:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    depends_on:
+      - db
   backend:  
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
     volumes:
       - ./src/:/code/src:ro
     ports:
@@ -25,6 +38,7 @@ services:
     env_file:
       - .env
     depends_on:
+      - keycloak
       - db
   postgres:
       image: postgres

@@ -2,17 +2,44 @@ version: '3'
 
 volumes:
   postgres_data:
-      driver: local
+    driver: local
+  db_data:
 
 services:
+  db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - db_data:/data/db
+    ports:
+      - 27017:27017
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile.etl
+    volumes:
+      - ./:/etl/:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    depends_on:
+      - db
   backend:  
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
     volumes:
       - ./src/:/code/src:ro
     ports:
       - '8000:80'
     env_file:
       - .env
+    depends_on:
+      - keycloak
+      - db
   postgres:
       image: postgres
       volumes:
@@ -32,8 +59,6 @@ services:
         DB_PASSWORD: password
         KEYCLOAK_USER: admin
         KEYCLOAK_PASSWORD: admin
-        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
-        #JDBC_PARAMS: "ssl=true"
       ports:
         - "8080:8080"
       depends_on:

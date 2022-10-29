@@ -5,7 +5,7 @@ Projeto de uma fábrica inteligente para a matéria MC855.
 Há um ambiente Docker para facilitar no encapsulamento do projeto. Para rodá-lo basta digitar o comando abaixo:
 ```bash
 # docker-compose up em windows e mac
-docker compose up
+docker compose up --build -d
 ```
 Após isto, é possível acessar a API no endereço [localhost:8000](localhost:8000).
 

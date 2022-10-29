@@ -1,0 +1,9 @@
+FROM python:3.10-slim
+
+WORKDIR /etl/
+
+COPY ./requirements.txt /etl/requirements.txt
+ 
+RUN pip install -r /etl/requirements.txt
+
+CMD [ "python3", "run.py" ]

@@ -32,6 +32,18 @@ class MongoConnection:
         sensors_collection  = db.telemetry
 
         return list(sensors_collection.find({"sensor_id": sensor_id}, {'_id': False}))
+
+    def get_last_telemetry(self, sensor_id, type):
+        db = self.client.smart_factory
+        sensors_collection  = db.telemetry
+
+        result = sensors_collection.find({"sensor_id": sensor_id, "type": type}).sort("inserted_at",-1).limit(1)
+        result = list(result)
+
+        if(len(result) == 0):
+            return None
+        else:
+            return result[0]["value"]
     
     def patch_sensor(self, sensor_id, data):
         my_dict = data.__dict__

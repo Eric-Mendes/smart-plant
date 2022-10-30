@@ -1,19 +1,33 @@
 from datetime import date
-from src.drivers.extractor_thingsboard import DriversThingsBoard
-from src.drivers.extractor_thingsboard import ExtractorThingsBoardInterface
-from src.stages.contracts.extract_contract import ExtractContract
-from src.errors.extract_error import ExtractError
+from src.drivers.extract_thingsboard import DriversThingsBoard
 
 from .extract import ExtractSensores
+from .extract import ExtractTelemetry
 import json
 
 def test_extract():
     '''  dsdefg'''
-    extract_excel = ExtractSensores
-    df_thinsg_board = ExtractSensores(extract_excel)
-    datas_thinsg_board = df_thinsg_board.extract()
-    #print()
-    print(json.dumps(datas_thinsg_board[0]))
+    base_url = "https://demo.thingsboard.io"
+    user = "mc855.projeto.5@gmail.com"
+    password = "vaX7Og1ehO74bFB"
+    thingsboard = DriversThingsBoard(base_url, user, password)
+
+    # telemetryData = prepareTelemetryData(thingsboard)
+    # devicesData = prepareDevicesData(thingsboard)
+    # print(json.dumps(telemetryData))
+
+    extract_sensores = ExtractSensores(thingsboard)
+    extract_telemetry = ExtractTelemetry(thingsboard)
+
+    sensores_data = extract_sensores.prepareDevicesData()
+    extract_telemetry = extract_telemetry.prepareTelemetryData()
+
+    print(json.dumps(sensores_data[0] ))
+    print()
+    print(json.dumps(extract_telemetry[0]))
+    # datas_thinsg_board = df_thinsg_board.extract()
+    # #print()
+    # print(json.dumps(datas_thinsg_board[0]))
     
     #print(datas_thinsg_board)
     #assert isinstance(datas_thinsg_board,ExtractContract)

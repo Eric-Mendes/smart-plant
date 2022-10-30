@@ -1,5 +1,5 @@
 
-from .extractor_thingsboard import DriversThingsBoard
+from .extract_thingsboard import DriversThingsBoard
 import json
 
 def test_extractor_thingsboard()-> None:

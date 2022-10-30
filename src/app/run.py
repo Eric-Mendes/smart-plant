@@ -1,8 +1,10 @@
 from fastapi import FastAPI, status, Response, Request
 
 import src.auth.keycloak as auth
-import src.drivers.mocks.dash_mocker as web
+
 from fastapi.middleware.cors import CORSMiddleware
+
+import src.db.MongoConnection as mongo
 
 # Criando aplicação
 app = FastAPI()
@@ -15,6 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+MONGO = mongo.MongoConnection()
+
 # Rota Raiz
 @app.get("/",tags=["root"])
 def root() -> dict:
@@ -23,7 +27,7 @@ def root() -> dict:
 
 
 ###### Validação Do Token #####
-def validate_request(request, response, group):
+def validate_request(request, response, group:str | list):
     token = request.headers.get('Authorization')
     my_authorization = auth.verify_token_and_group(token, group)
 
@@ -33,11 +37,12 @@ def validate_request(request, response, group):
             "msg": "invalid token"
         }
 
-    elif(my_authorization["in_group"] != True):
+    elif(group != None and my_authorization["in_group"] != True):
+
         response.status_code = status.HTTP_403_FORBIDDEN
 
         return {
-            "msg": "the owener of the token is not an administrator"
+            "msg": "the owener of the token is not on authorized group"  
         }
     
     return True
@@ -183,6 +188,104 @@ def get_groups(request: Request, response: Response):
         return {
             "groups" : groups
         }
+
+#### Sensors #####
+@app.get("/sensors/list", tags=["sensors"], summary= 'Retorna a lista de sensores referente aos grupos do usuario', status_code=status.HTTP_200_OK)
+def getSensors(request: Request, response: Response):
+    validate= validate_request(request, response, None)
+
+    if(validate is True):
+        my_data = MONGO.get_sensors_list()
+        
+        token = request.headers.get('Authorization')
+        user_data = auth.getInfoByToken(token)
+
+        user_groups = [group.name for group in auth.get_user_kc_groups(user_data["sub"])]
+
+        filtered_sensors = [sensor for sensor in my_data for my_group in user_groups if my_group in sensor["groups"]]
+
+        for sensor in filtered_sensors:
+            for info in sensor["info"]:
+                info["last_value"] = MONGO.get_last_telemetry(sensor["sensor_id"], info["type"])
+        
+        return filtered_sensors
+    
+    else:
+        return validate
+
+@app.get("/sensors", tags=["sensors"], summary= 'Retorna um sensor dado um id, precisa de um token valido para o sensor', status_code=status.HTTP_200_OK)
+def getOneSensor(sensor_id, request: Request, response: Response):
+    my_data = MONGO.get_sensor(sensor_id)
+    
+    if(len(my_data) != 0):
+        groups = my_data[0]["groups"]
+    else:
+        groups = None
+
+    validate = validate_request(request, response, groups)
+
+    if(validate == True):
+        if(len(my_data) != 0):
+            return my_data[0]
+    else:
+        return validate
+
+@app.patch("/sensors", tags=["sensors"], summary= 'Altera um sensor, usuario deve pertencer ao grupo', status_code=status.HTTP_200_OK)
+def patchSensor(sensor_id, data: mongo.SensorPatch, request: Request, response: Response):
+    my_data = MONGO.get_sensor(sensor_id)
+    
+    if(len(my_data) != 0):
+        groups = my_data[0]["groups"]
+    else:
+        groups = None
+
+    validate = validate_request(request, response, groups)
+    
+    if(validate == True):
+        if(len(my_data) != 0):
+            MONGO.patch_sensor(sensor_id, data)
+    else:
+        return validate
+
+@app.get("/telemetry/list", tags=["telemetry"], summary= 'Retorna a telemetria referente aos grupos do usuario', status_code=status.HTTP_200_OK)
+def getTelemetryList(request: Request, response: Response):
+    validate= validate_request(request, response, None)
+    if(validate is True):
+        telemetry_list = MONGO.get_telemetry_list()
+        sensors_list = MONGO.get_sensors_list()
+        
+        sensor_groups = {}
+        for data in sensors_list:
+            sensor_groups[data["sensor_id"]] = data["groups"]
+
+        token = request.headers.get('Authorization')
+        user_data = auth.getInfoByToken(token)
+
+        user_groups = [group.name for group in auth.get_user_kc_groups(user_data["sub"])]
+
+        return [
+            telemetry for telemetry in telemetry_list for my_group in user_groups if my_group in sensor_groups[telemetry["sensor_id"]]
+            ]
+    else:
+        return validate
+    
+@app.get("/telemetry", tags=["telemetry"], summary= 'Retorna a telemetria dado um id de sensor, precisa de um token valido para o sensor', status_code=status.HTTP_200_OK)
+def getSensorTelemetry(sensor_id, request: Request, response: Response):
+    my_data = MONGO.get_sensor(sensor_id)
+    
+    if(len(my_data) != 0):
+        groups = my_data[0]["groups"]
+    else:
+        groups = None
+
+    validate = validate_request(request, response, groups)
+
+    if(validate == True):
+        if(len(my_data) != 0):
+            telemetry = MONGO.get_sensor_telemetry(sensor_id)
+            return telemetry
+    else:
+        return validate
 #Kill
 # @app.get("/history")
 # def get_history(id:int,n_days:int) -> list:
@@ -196,32 +299,35 @@ def get_groups(request: Request, response: Response):
 #     """Retornando tempo limite"""
 #     return web.get_limit(20, 40)
 
+
+
+############ mock #################
 ## Substituir
-@app.get("/sensorsInfo",tags=["legacy"])
-def get_sensors_info():
-    return web.create_fake_sensors(10)
-###################################################################################
-#GET
-@app.get("/sensors/{sensor_id}",tags=["sensors"],summary= 'Retorna as informações de um sensor específico.')
-def get_sensor(sensor_id:int):
-    return web.sensor_builder(sensor_id)
+# @app.get("/sensorsInfo",tags=["legacy"])
+# def get_sensors_info():
+#     return web.create_fake_sensors(10)
+# ###################################################################################
+# #GET
+# @app.get("/sensors/{sensor_id}",tags=["sensors"],summary= 'Retorna as informações de um sensor específico.')
+# def get_sensor(sensor_id:int):
+#     return web.sensor_builder(sensor_id)
 
-#GET
-@app.get("/sensors",tags=["sensors"],summary= 'Retorna n sensores')
-def get_sensors(n_sensors:int):
-    return [web.sensor_builder(i) for i in range(1, n_sensors+1)]
+# #GET
+# @app.get("/sensors",tags=["sensors"],summary= 'Retorna n sensores')
+# def get_sensors(n_sensors:int):
+#     return [web.sensor_builder(i) for i in range(1, n_sensors+1)]
 
-@app.get("/history",tags=["history"],summary= 'Retorna o historico dos n dias de um sensor.')
-def get_values(sensor_id:int, n_days:int):
-    return web.build_temp_history(sensor_id, n_days)
+# @app.get("/history",tags=["history"],summary= 'Retorna o historico dos n dias de um sensor.')
+# def get_values(sensor_id:int, n_days:int):
+#     return web.build_temp_history(sensor_id, n_days)
 
-#POST
-@app.post("/sensors",tags=["sensors"],summary= 'Cria um sensor')
-def create_sensor(my_sensor:web.MySensor):
+# #POST
+# @app.post("/sensors",tags=["sensors"],summary= 'Cria um sensor')
+# def create_sensor(my_sensor:web.MySensor):
 
-    web.add_sensor_to_db(my_sensor)
+#     web.add_sensor_to_db(my_sensor)
 
-# #PATCH
-@app.patch("/sensors/{id}",tags=["sensors"],summary= 'Cria um sensor')
-def sensor(id:int, input_json:web.MySensor):
-    web.patch_sensor(id, input_json)
+# # #PATCH
+# @app.patch("/sensors/{id}",tags=["sensors"],summary= 'Cria um sensor')
+# def sensor(id:int, input_json:web.MySensor):
+#     web.patch_sensor(id, input_json)

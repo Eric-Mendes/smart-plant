@@ -38,6 +38,9 @@ def validate_user_credentials(username: str, password: str):
 
 def getInfoByToken(token: str):
     try:
+        if("Bearer" in token):
+            token = token.split()[-1]
+
         keycloak_open_id = getKeyCloakOpenId()
         data = keycloak_open_id.userinfo(token)
     
@@ -169,8 +172,11 @@ def verify_token_and_group(token, desired_group):
 
             groups = [group.name for group in my_groups]
 
-            if(desired_group in groups):
+            if(isinstance(desired_group, str) and desired_group in groups):
                 in_group = True
+            
+            elif(isinstance(desired_group, list)):
+                in_group = any(x in desired_group for x in groups)
 
     return {
         "is_valid": is_valid,

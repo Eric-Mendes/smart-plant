@@ -7,6 +7,7 @@ from pydantic import BaseModel
 # Criando um modelo
 class User(BaseModel):
     """   Rota raiz    """
+
     id: int
     email: str
     name: str

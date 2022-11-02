@@ -4,10 +4,14 @@ Projeto de uma fábrica inteligente para a matéria MC855.
 ## Rodando o projeto
 Há um ambiente Docker para facilitar no encapsulamento do projeto. Para rodá-lo basta digitar o comando abaixo:
 ```bash
-# docker-compose up em windows e mac
-docker compose up --build -d
+# Necessário ter sudo da máquina
+mkdir -p ~/.mytb-data && sudo chown -R 799:799 ~/.mytb-data
+mkdir -p ~/.mytb-logs && sudo chown -R 799:799 ~/.mytb-logs
+
+# docker-compose up --build em windows e mac
+docker compose up --build
 ```
-Após isto, é possível acessar a API no endereço [localhost:8000](localhost:8000).
+Após isto, é possível acessar a API no endereço [localhost:8000](localhost:8000), o Keycloak no endereço [localhost:8080](localhost:8080) (instruções abaixo), e o thingsboard no endereço [localhost:9090](localhost:9090) (informações de login nas envvars no docker-compose.yaml).
 
 Para corretamente derrubar este projeto após o uso, rode o comando abaixo:
 ```bash

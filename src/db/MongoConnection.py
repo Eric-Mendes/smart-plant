@@ -69,3 +69,16 @@ class MongoConnection:
             del my_dict["info"]
 
         sensors_collection.update_one({"sensor_id": sensor_id}, {"$set": my_dict})
+
+    def addGroup(self, sensor_id, group):
+        db = self.client.smart_factory
+        sensors_collection  = db.sensors
+
+        sensors_collection.update_one({"sensor_id": sensor_id},{"$addToSet": {"groups": group}})
+    
+    def removeGroup(self, sensor_id, group):
+        db = self.client.smart_factory
+        sensors_collection  = db.sensors
+
+        if(group != "Admin"):
+            sensors_collection.update_one({"sensor_id": sensor_id},{"$pull": {"groups": group}})

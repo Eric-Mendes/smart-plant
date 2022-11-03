@@ -22,7 +22,6 @@ class LoadTransformedData:
             if(sensor['sensor_id'] not in ids):
                 list_sensor.append(sensor)
 
-        
         if(len(list_sensor) > 0):
             collection.insert_many(list_sensor)
 
@@ -39,16 +38,3 @@ class LoadTransformedData:
         
         if(len(list_telemetry) > 0):
             collection.insert_many(list_telemetry)
-
-
-            
-
-
-
-# db = client.smart_factory
-# collection = db.measurements
-
-# collection.insert_one({'Name':'pini','idade':8000})
-
-# collection.delete_many({})
-# print(list(collection.find({})))

@@ -117,6 +117,23 @@ def remove_user_group(user_id, user_group):
     except:
         return False
 
+def create_new_group(group_name):
+    try:
+        keycloak_admin = getKeyCloakAdmin()
+        keycloak_admin.create_group({
+            "name": group_name
+        })
+        return True
+    except:
+        return False
+
+def delete_group(group_id):
+    try:
+        keycloak_admin = getKeyCloakAdmin()
+        keycloak_admin.delete_group(group_id)
+        return True
+    except:
+        return False
 
 ## Funções Relacionadas a usuarios
 def get_users():

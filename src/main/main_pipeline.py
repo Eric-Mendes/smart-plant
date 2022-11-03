@@ -24,10 +24,7 @@ class MainPipeline:
             sensores_data = extract_sensores.prepareDevicesData()
             telemetry_data = extract_telemetry.prepareTelemetryData()
 
-            #Ajustar 
-            load_result_sensors = load.load_sensors(sensores_data[0])
-            load_result_telemetry = load.load_telemetry(telemetry_data[0])
-
-        print(datetime.now())
+            load.load_sensors(sensores_data[0])
+            load.load_telemetry(telemetry_data[0])
         
 

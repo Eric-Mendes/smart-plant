@@ -189,6 +189,36 @@ def get_groups(request: Request, response: Response):
             "groups" : groups
         }
 
+@app.post("/groups", tags=["groups"], summary= 'Cria um grupo novo', status_code=status.HTTP_201_CREATED)
+def create_group(group_name:str, request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    else:
+        created = auth.create_new_group(group_name)
+
+        if(created == True):
+            response.status_code = status.HTTP_201_CREATED
+        else:
+            response.status_code = status.HTTP_409_CONFLICT
+
+@app.delete("/groups", tags=["groups"], summary= 'Deleta um grupo', status_code=status.HTTP_202_ACCEPTED)
+def create_group(group_id:str, request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    else:
+        created = auth.delete_group(group_id)
+
+        if(created == True):
+            response.status_code = status.HTTP_202_ACCEPTED
+        else:
+            response.status_code = status.HTTP_409_CONFLICT
+
 #### Sensors #####
 @app.get("/sensors/list", tags=["sensors"], summary= 'Retorna a lista de sensores referente aos grupos do usuario', status_code=status.HTTP_200_OK)
 def getSensors(request: Request, response: Response):
@@ -202,7 +232,7 @@ def getSensors(request: Request, response: Response):
 
         user_groups = [group.name for group in auth.get_user_kc_groups(user_data["sub"])]
 
-        filtered_sensors = [sensor for sensor in my_data for my_group in user_groups if my_group in sensor["groups"]]
+        filtered_sensors = [sensor for sensor in my_data if len(list(set(user_groups) & set(sensor["groups"]))) != 0]
 
         for sensor in filtered_sensors:
             for info in sensor["info"]:
@@ -247,6 +277,25 @@ def patchSensor(sensor_id, data: mongo.SensorPatch, request: Request, response: 
     else:
         return validate
 
+@app.post("/sensors/groups", tags=["sensors"], summary= 'Adiciona um grupo ao sensor', status_code=status.HTTP_200_OK)
+def addGroupToSensor(sensor_id:str, group_name:str, request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    MONGO.addGroup(sensor_id, group_name)
+
+@app.delete("/sensors/groups", tags=["sensors"], summary= 'Deleta um grupo de um sensor', status_code=status.HTTP_200_OK)
+def removeGroupOfSensor(sensor_id:str, group_name:str, request: Request, response: Response):
+    validy = validate_request(request, response, "Admin")
+
+    if(validy != True):
+        return validy
+
+    MONGO.removeGroup(sensor_id, group_name)
+
+##### Telemetry ######
 @app.get("/telemetry/list", tags=["telemetry"], summary= 'Retorna a telemetria referente aos grupos do usuario', status_code=status.HTTP_200_OK)
 def getTelemetryList(request: Request, response: Response):
     validate= validate_request(request, response, None)

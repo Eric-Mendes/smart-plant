@@ -8,5 +8,4 @@ class Info(BaseModel):
     
 class SensorPatch(BaseModel):
     located_at: Optional[str] = False
-    info: Optional[List[Info]]
-    groups: Optional[list] = False
+    info: Optional[List[Info]] = False

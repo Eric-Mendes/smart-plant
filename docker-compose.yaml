@@ -40,6 +40,27 @@ services:
     depends_on:
       - keycloak
       - db
+  thingsboard:
+    image: thingsboard/tb-postgres
+    ports:
+      - 9090:9090
+      - 1883:1883
+      - 7070:7070
+      - 5683-5688:5683-5688/udp
+    volumes:
+      - ~/.mytb-data:/data
+      - ~/.mytb-logs:/var/log/thingsboard
+    environment:
+      - SYS_ADMIN_USERNAME=sysadmin@thingsboard.org
+      - SYS_ADMIN_PWD=sysadmin
+      - TENANT_ADMIN_USERNAME=tenant@thingsboard.org
+      - TENANT_ADMIN_PWD=tenant
+      - CUSTOMER_USER_USERNAME=customer@thingsboard.org
+      - CUSTOMER_USER_PWD=customer
+    restart: always
+    tty: true
+    depends_on:
+      - backend
   postgres:
       image: postgres
       volumes:

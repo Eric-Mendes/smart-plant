@@ -13,6 +13,7 @@ class KeycloakUser(BaseModel):
     last_name: str
     created_timestamp: int
     groups: List[KeycloakGroup]
+    token: str
 
 class UserGroup(BaseModel):
     user_id: str

@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi import FastAPI, status, Response, Request
 
 import src.auth.keycloak as auth
@@ -49,7 +51,7 @@ def validate_request(request, response, group:str | list):
 
 ###### Auth ######
 @app.get("/authUser", tags=["auth"], summary='Tenta autenticar o usuário, retorna um token')
-def auth_user(username: str, password: str, response: Response) -> bool:
+def auth_user(username: str, password: str, response: Response):
     token = auth.validate_user_credentials(username, password)
     if token is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
@@ -69,6 +71,9 @@ def auth_user_get_user_info(username: str, password: str, response: Response):
     user = auth.validate_credentials_get_user_info(username, password)
     if user is None:
         response.status_code = status.HTTP_401_UNAUTHORIZED
+        return {
+            "message": "UNAUTHORIZED"
+        }
     return user
 
 ###### Validate #######

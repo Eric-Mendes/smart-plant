@@ -51,7 +51,7 @@ def getInfoByToken(token: str):
         return None
 
 
-def get_user_info(username: str) -> KeycloakUser:
+def get_user_info(username: str, token: str) -> KeycloakUser:
     try:
         keycloak_admin = getKeyCloakAdmin()
 
@@ -65,7 +65,8 @@ def get_user_info(username: str) -> KeycloakUser:
             first_name=user['firstName'],
             last_name=user['lastName'],
             created_timestamp=user['createdTimestamp'],
-            groups=groups
+            groups=groups,
+            token=token
         )
 
         return kc_user
@@ -73,9 +74,11 @@ def get_user_info(username: str) -> KeycloakUser:
     except Exception as e:
         raise e
 
-def validate_credentials_get_user_info(username: str, password: str, settings: Settings) -> Optional[KeycloakUser]:
-    if validate_user_credentials(username, password, settings):
-        return get_user_info(username, settings)
+def validate_credentials_get_user_info(username: str, password: str) -> Optional[KeycloakUser]:
+    token = validate_user_credentials(username, password)
+
+    if token:
+        return get_user_info(username, token)
     else:
         return None
 

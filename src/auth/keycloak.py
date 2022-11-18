@@ -38,6 +38,9 @@ def validate_user_credentials(username: str, password: str):
 
 def getInfoByToken(token: str):
     try:
+        if("Bearer" in token):
+            token = token.split()[-1]
+
         keycloak_open_id = getKeyCloakOpenId()
         data = keycloak_open_id.userinfo(token)
     
@@ -48,7 +51,7 @@ def getInfoByToken(token: str):
         return None
 
 
-def get_user_info(username: str) -> KeycloakUser:
+def get_user_info(username: str, token: str) -> KeycloakUser:
     try:
         keycloak_admin = getKeyCloakAdmin()
 
@@ -62,7 +65,8 @@ def get_user_info(username: str) -> KeycloakUser:
             first_name=user['firstName'],
             last_name=user['lastName'],
             created_timestamp=user['createdTimestamp'],
-            groups=groups
+            groups=groups,
+            token=token
         )
 
         return kc_user
@@ -70,9 +74,11 @@ def get_user_info(username: str) -> KeycloakUser:
     except Exception as e:
         raise e
 
-def validate_credentials_get_user_info(username: str, password: str, settings: Settings) -> Optional[KeycloakUser]:
-    if validate_user_credentials(username, password, settings):
-        return get_user_info(username, settings)
+def validate_credentials_get_user_info(username: str, password: str) -> Optional[KeycloakUser]:
+    token = validate_user_credentials(username, password)
+
+    if token:
+        return get_user_info(username, token)
     else:
         return None
 
@@ -114,6 +120,23 @@ def remove_user_group(user_id, user_group):
     except:
         return False
 
+def create_new_group(group_name):
+    try:
+        keycloak_admin = getKeyCloakAdmin()
+        keycloak_admin.create_group({
+            "name": group_name
+        })
+        return True
+    except:
+        return False
+
+def delete_group(group_id):
+    try:
+        keycloak_admin = getKeyCloakAdmin()
+        keycloak_admin.delete_group(group_id)
+        return True
+    except:
+        return False
 
 ## Funções Relacionadas a usuarios
 def get_users():
@@ -169,8 +192,11 @@ def verify_token_and_group(token, desired_group):
 
             groups = [group.name for group in my_groups]
 
-            if(desired_group in groups):
+            if(isinstance(desired_group, str) and desired_group in groups):
                 in_group = True
+            
+            elif(isinstance(desired_group, list)):
+                in_group = any(x in desired_group for x in groups)
 
     return {
         "is_valid": is_valid,

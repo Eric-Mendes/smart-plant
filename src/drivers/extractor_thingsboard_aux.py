@@ -6,19 +6,8 @@ import json
 
 
 class DriversThingsBoard(ExtractorThingsBoardInterface):
-    # @classmethod
-    # def extract_thingsboard(cls) -> dict:
 
-    #     """Adicionar"""
-    #     response = requests.get(
-    #         url="https://demo.thingsboard.io/api/plugins/telemetry/DEVICE/70a5e740-441b-11ed-a339-0708081d40ce/values/timeseries?keys=humidity,temperature",
-    #         headers={
-    #             "x-authorization": authorization,
-    #             "content-type": "application/json",
-    #         },
-    #     )
 
-    #     return response.json()
     @classmethod
     def getToken(cls,user, pwd) -> dict:
         url = "https://demo.thingsboard.io/api/auth/login"

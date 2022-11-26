@@ -1,12 +1,12 @@
-from typing import Union
-
 from fastapi import FastAPI, status, Response, Request
 
 import src.auth.keycloak as auth
+import src.auth.setup as kcsetup
 
 from fastapi.middleware.cors import CORSMiddleware
 
 import src.db.MongoConnection as mongo
+import time
 
 # Criando aplicação
 app = FastAPI()
@@ -21,10 +21,20 @@ app.add_middleware(
 
 MONGO = mongo.MongoConnection()
 
+tries = 0
+while tries < 20:
+    try:
+        kcsetup.keycloak_setup()
+        break
+    except:
+        tries+= 1
+        time.sleep(10)
+
 # Rota Raiz
 @app.get("/",tags=["root"])
 def root() -> dict:
     """Rota raiz"""
+
     return {"message": "Hello World"}  # Retornando um dicionário
 
 
@@ -308,6 +318,8 @@ def getTelemetryList(request: Request, response: Response):
         telemetry_list = MONGO.get_telemetry_list()
         sensors_list = MONGO.get_sensors_list()
         
+        print(telemetry_list)
+        
         sensor_groups = {}
         for data in sensors_list:
             sensor_groups[data["sensor_id"]] = data["groups"]
@@ -317,9 +329,11 @@ def getTelemetryList(request: Request, response: Response):
 
         user_groups = [group.name for group in auth.get_user_kc_groups(user_data["sub"])]
 
-        return [
+        filtered = [
             telemetry for telemetry in telemetry_list for my_group in user_groups if my_group in sensor_groups[telemetry["sensor_id"]]
-            ]
+        ]
+
+        return filtered
     else:
         return validate
     

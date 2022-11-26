@@ -18,8 +18,12 @@ class MainPipeline:
         load = LoadTransformedData()
 
         while True:
-            extract_sensores = ExtractSensores(thingsboard)
-            extract_telemetry = ExtractTelemetry(thingsboard)
+            try:
+                extract_sensores = ExtractSensores(thingsboard)
+                extract_telemetry = ExtractTelemetry(thingsboard)
+            except:
+                print("ETL: Erro nas requests")
+                continue
 
             sensores_data = extract_sensores.prepareDevicesData()
             telemetry_data = extract_telemetry.prepareTelemetryData()

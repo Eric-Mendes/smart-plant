@@ -29,7 +29,7 @@ class DriversThingsBoard:
             "Authorization": f"Bearer {self.token}" 
         }
 
-        response = requests.get(url = url, headers = header)
+        response = requests.get(url = url, headers = header, timeout=20)
 
         devices = response.json()["data"]
         
@@ -43,7 +43,7 @@ class DriversThingsBoard:
             "Authorization": f"Bearer {self.token}" 
         }
 
-        response = requests.get(url = url, headers = header)
+        response = requests.get(url = url, headers = header, timeout=20)
 
         return response.json()
     
@@ -55,6 +55,6 @@ class DriversThingsBoard:
             "Authorization": f"Bearer {self.token}" 
         }
 
-        response = requests.get(url = url, headers = header)
+        response = requests.get(url = url, headers = header, timeout=20)
 
         return response.json()

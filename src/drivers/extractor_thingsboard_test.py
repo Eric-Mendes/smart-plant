@@ -1,4 +1,3 @@
-
 from .extract_thingsboard import DriversThingsBoard
 import json
 

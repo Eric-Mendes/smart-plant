@@ -1,12 +1,8 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class ExtractorThingsBoardInterface(ABC):
     """Interface referente ao dados vindos do ThingsBoard"""
 
-    # @classmethod
-    # def extract_thingsboard(cls)-> dict:
-    #     '''asd'''
-    #     pass
     @classmethod
     def getToken(user, pwd) -> dict:
         ''' Interface referente a getToken'''

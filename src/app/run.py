@@ -1,10 +1,7 @@
 from fastapi import FastAPI, status, Response, Request
-
 import src.auth.keycloak as auth
 import src.auth.setup as kcsetup
-
 from fastapi.middleware.cors import CORSMiddleware
-
 import src.db.MongoConnection as mongo
 import time
 
@@ -318,7 +315,7 @@ def getTelemetryList(request: Request, response: Response):
         telemetry_list = MONGO.get_telemetry_list()
         sensors_list = MONGO.get_sensors_list()
         
-        print(telemetry_list)
+        
         
         sensor_groups = {}
         for data in sensors_list:
@@ -354,48 +351,3 @@ def getSensorTelemetry(sensor_id, request: Request, response: Response):
             return telemetry
     else:
         return validate
-#Kill
-# @app.get("/history")
-# def get_history(id:int,n_days:int) -> list:
-#     """Retornando tempo para cada tipo de temperatura"""
-#     print(id)
-#     return web.get_history(27, 30, n_days=n_days)
-
-#Kill
-# @app.get("/timeLimites")
-# def get_limit():
-#     """Retornando tempo limite"""
-#     return web.get_limit(20, 40)
-
-
-
-############ mock #################
-## Substituir
-# @app.get("/sensorsInfo",tags=["legacy"])
-# def get_sensors_info():
-#     return web.create_fake_sensors(10)
-# ###################################################################################
-# #GET
-# @app.get("/sensors/{sensor_id}",tags=["sensors"],summary= 'Retorna as informações de um sensor específico.')
-# def get_sensor(sensor_id:int):
-#     return web.sensor_builder(sensor_id)
-
-# #GET
-# @app.get("/sensors",tags=["sensors"],summary= 'Retorna n sensores')
-# def get_sensors(n_sensors:int):
-#     return [web.sensor_builder(i) for i in range(1, n_sensors+1)]
-
-# @app.get("/history",tags=["history"],summary= 'Retorna o historico dos n dias de um sensor.')
-# def get_values(sensor_id:int, n_days:int):
-#     return web.build_temp_history(sensor_id, n_days)
-
-# #POST
-# @app.post("/sensors",tags=["sensors"],summary= 'Cria um sensor')
-# def create_sensor(my_sensor:web.MySensor):
-
-#     web.add_sensor_to_db(my_sensor)
-
-# # #PATCH
-# @app.patch("/sensors/{id}",tags=["sensors"],summary= 'Cria um sensor')
-# def sensor(id:int, input_json:web.MySensor):
-#     web.patch_sensor(id, input_json)

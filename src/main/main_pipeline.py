@@ -5,10 +5,10 @@ from src.stages.load.load_aux import LoadTransformedData
 import json 
 
 class MainPipeline:
-    ''' Colocar doctring'''
+    ''' Fluxo de execução do pipeline. '''
     @classmethod
     def run_pipeline(cls) -> None:
-        ''' Colocar doctring'''
+        ''' Execução do Fluxo de execução do pipeline'''
 
         #Extract 
         base_url = "https://demo.thingsboard.io"

@@ -32,5 +32,6 @@ Você deve notar que o projeto depende de algumas variáveis de ambiente para ro
 Para subir os containeres com elas, crie na raiz um arquivo chamado de `.env` com as chaves e valores destas variáveis (entre em contato com os responsáveis para saber quais são).
 
 Por exemplo, as variáveis de ambiente são usadas pelos endpoints de autenticação do Keycloak. 
-Um exemplo de .env para poder usar os endpoints de autenticação está no arquivo **dotenv-example** na raíz do projeto.
-Em especial, é necessário mudar a variável **kc_server_url** para o seu IP local, mas sem usar **localhost** como _**alias**_ para o IP.
+Um exemplo de .env para poder usar os endpoints de autenticação está no arquivo **.env.example** na raíz do projeto.
+
+Para o thingsboard, é necessario definir a url utilizada e usuario/senha de um usuario Tenant. No arquivo .env.exemple estão definidas as variaveis para rodar utilizando o container do docker.

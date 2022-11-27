@@ -15,7 +15,7 @@ def keycloak_setup():
 
     kc_admin.update_user(admin["id"],{
         "firstName": "admin",
-        "lastName": "admin",
+        "lastName": "",
         "email": "admin@admin.com",
         "emailVerified": True
     })

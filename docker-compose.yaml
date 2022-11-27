@@ -25,7 +25,10 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    env_file:
+      - .env
     depends_on:
+      - thingsboard
       - db
   backend:  
     build:

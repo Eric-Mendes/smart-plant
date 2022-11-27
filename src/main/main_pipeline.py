@@ -31,7 +31,7 @@ class MainPipeline:
 
                 load.load_sensors(sensores_data[0])
                 load.load_telemetry(telemetry_data[0])
-                time.sleep(1)
+                time.sleep(2)
                
             except:
                 thingsboard == None

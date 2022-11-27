@@ -6,4 +6,4 @@ COPY ./requirements.txt /etl/requirements.txt
  
 RUN pip install -r /etl/requirements.txt
 
-CMD [ "python3", "run.py" ]
+CMD [ "python3", "-u", "run.py" ]

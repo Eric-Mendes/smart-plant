@@ -61,9 +61,9 @@ class MongoConnection:
             for info in my_info:
                 if(info["type"] in type_list):
                     pos = type_list.index(info["type"])
-                    if(info["bottom_limit"] != False):
+                    if(info["bottom_limit"] is not False):
                         my_dict[f"info.{pos}.bottom_limit"] = info["bottom_limit"]
-                    if(info["upper_limit"] != False):
+                    if(info["upper_limit"] is not False):
                         my_dict[f"info.{pos}.upper_limit"] = info["upper_limit"]
             
             del my_dict["info"]
